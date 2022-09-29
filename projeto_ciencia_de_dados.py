@@ -3,6 +3,8 @@
 import pandas as pd
 import pathlib
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 meses = {'jan': 1, 'fev': 2, 'mar': 3, 'abr': 4, 'mai': 5, 'jun': 6, 'jul': 7, 'ago': 8, 'set': 9, 'out': 10, 'nov': 11, 'dez': 12}
 
@@ -17,7 +19,7 @@ for arquivo in caminho_bases.iterdir():
     ano = arquivo.name[-8:]
     ano = int(ano.replace('.csv', ''))
 
-    df = pd.read_csv(caminho_bases / arquivo.name)
+    df = pd.read_csv(caminho_bases / arquivo.name, low_memory=False)
     df['ano'] = ano
     df['mes'] = mes
     base_airbnb = pd.concat([base_airbnb, df])
@@ -41,12 +43,43 @@ for coluna in base_airbnb:
 base_airbnb = base_airbnb.dropna()
 
 #alterando preço e extra_people para float (esta sendo reconhecido como objeto)
-base_airbnb['price'] = base_airbnb['price'].str.replace('$', '')
+base_airbnb['price'] = base_airbnb['price'].str.replace('$', '', regex=True)
 base_airbnb['price'] = base_airbnb['price'].str.replace(',', '')
-base_airbnb['price'] = base_airbnb['price'].astype(np.float32, copy=False)
+base_airbnb['price'] = base_airbnb['price'].astype(np.float32)
 
-base_airbnb['extra_people'] = base_airbnb['extra_people'].str.replace('$', '')
+base_airbnb['extra_people'] = base_airbnb['extra_people'].str.replace('$', '', regex=True)
 base_airbnb['extra_people'] = base_airbnb['extra_people'].str.replace(',', '')
-base_airbnb['extra_people'] = base_airbnb['extra_people'].astype(np.float32, copy=False)
+base_airbnb['extra_people'] = base_airbnb['extra_people'].astype(np.float32)
 
-print(base_airbnb.dtypes)
+#Análise Exploratória e Tratar Outliers
+
+#Ver a correlação entre as features e decidir se manteremos todas as features que temos.
+#Excluir outliers (usaremos como regra, valores abaixo de Q1 - 1.5xAmplitude e valores acima de Q3 + 1.5x Amplitude). Amplitude = Q3 - Q1
+#Confirmar se todas as features que temos fazem realmente sentido para o nosso modelo ou se alguma delas não vai nos ajudar e se devemos excluir
+
+plt.figure(figsize=(15, 10))
+sns.heatmap(base_airbnb.corr(), annot=True, cmap='Greens')
+
+#Definição de funções para análsie de outliers
+
+def limites(coluna):
+    q1 = coluna.quantile(0.25)
+    q3 = coluna.quantile(0.75)
+    amplitude = q3 - q1
+    return q1 - 1.5 * amplitude, q3 + 1.5 * amplitude
+
+def diagrama_caixa(coluna):
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig.set_size_inches(15, 5)
+    sns.boxplot(x=coluna, ax=ax1)
+    ax2.set_xlim(limites(coluna))
+    sns.boxplot(x=coluna, ax=ax2)
+
+def histograma(coluna):
+    plt.figure(figsize=(15, 5))
+    sns.histplot(coluna)
+
+
+diagrama_caixa(base_airbnb['price'])
+histograma(base_airbnb['price'])
+plt.show()

@@ -85,10 +85,12 @@ def histograma(coluna):
     plt.figure(figsize=(15, 5))
     sns.histplot(coluna)
 
+
 def grafico_barra(coluna):
     plt.figure(figsize=(15, 5))
     ax = sns.barplot(x=coluna.value_counts().index, y=coluna.value_counts())
     ax.set_xlim(limites(coluna))
+
 
 # Definição de função para excluir outliers
 
@@ -99,6 +101,7 @@ def excluir_outliers(df, nome_coluna):
     df = df.loc[(df[nome_coluna] >= lim_inf) & (df[nome_coluna] <= lim_sup), :]
     linhas_removidas = qtde_linhas - df.shape[0]
     return df, linhas_removidas
+
 
 # Análise dos outliers de preço
 
@@ -119,11 +122,70 @@ print(f'{linhas_removidas} Linhas removidas')
 
 # Análise dos outliers de host_listings_count
 
-diagrama_caixa(base_airbnb['host_listings_count'])
-grafico_barra(base_airbnb['host_listings_count'])
+# diagrama_caixa(base_airbnb['host_listings_count'])
+# grafico_barra(base_airbnb['host_listings_count'])
 
 base_airbnb, linhas_removidas = excluir_outliers(base_airbnb, 'host_listings_count')
 print(f'{linhas_removidas} Linhas removidas')
 
-plt.show()
+# Análise dos outliers de accommodates
 
+# diagrama_caixa(base_airbnb['accommodates'])
+# grafico_barra(base_airbnb['accommodates'])
+
+base_airbnb, linhas_removidas = excluir_outliers(base_airbnb, 'accommodates')
+print(f'{linhas_removidas} Linhas removidas')
+
+# Análise dos outliers de bathrooms
+
+# diagrama_caixa(base_airbnb['bathrooms'])
+# grafico_barra(base_airbnb['bathrooms'])
+
+base_airbnb, linhas_removidas = excluir_outliers(base_airbnb, 'bathrooms')
+print(f'{linhas_removidas} linhas removidas')
+
+# Análise dos outliers de bedrooms
+
+# diagrama_caixa(base_airbnb['bedrooms'])
+# grafico_barra(base_airbnb['bedrooms'])
+
+base_airbnb, linhas_removidas = excluir_outliers(base_airbnb, 'bedrooms')
+print(f'{linhas_removidas} linhas removidas')
+
+# Análise dos outliers de beds
+
+# diagrama_caixa(base_airbnb['beds'])
+# grafico_barra(base_airbnb['beds'])
+
+base_airbnb, linhas_removidas = excluir_outliers(base_airbnb, 'beds')
+print(f'{linhas_removidas} linhas removidas')
+
+# Análise dos outliers de guests_included
+
+# print(limites(base_airbnb['guests_included']))
+# plt.figure(figsize=(15, 5))
+# sns.barplot(x=base_airbnb['guests_included'].value_counts().index, y=base_airbnb['guests_included'].value_counts())
+
+base_airbnb = base_airbnb.drop('guests_included', axis=1)
+
+# Análise dos outliers de minimum_nights
+
+# diagrama_caixa(base_airbnb['minimum_nights'])
+# grafico_barra(base_airbnb['minimum_nights'])
+
+base_airbnb, linhas_removidas = excluir_outliers(base_airbnb, 'minimum_nights')
+print(f'{linhas_removidas} linhas removidas')
+
+# Análise dos outliers de maximum_nights
+
+# diagrama_caixa(base_airbnb['maximum_nights'])
+# grafico_barra(base_airbnb['maximum_nights'])
+
+base_airbnb = base_airbnb.drop('maximum_nights', axis=1)
+
+# Análise dos outliers de number_of_reviews
+
+# diagrama_caixa(base_airbnb['number_of_reviews'])
+# grafico_barra(base_airbnb['number_of_reviews'])
+
+base_airbnb = base_airbnb.drop('number_of_reviews', axis=1)
